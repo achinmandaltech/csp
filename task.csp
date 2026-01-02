@@ -1,1 +1,30 @@
 
+using System.Threading;
+using System.Threading.Tasks;
+
+
+    static void Main()
+    {
+        CancellationTokenSource cts = new CancellationTokenSource();
+
+        Task task = new Task(() =>
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                if (cts.Token.IsCancellationRequested)
+                {
+                    Console.WriteLine("Task canceled!");
+                    return;
+                }
+
+                Console.WriteLine($"Task is working... {i}");
+                Thread.Sleep(100);
+            }
+        }, cts.Token);
+
+        task.Start();
+
+        Thread.Sleep(210);   // Simulate condition
+        cts.Cancel();        // Request cancellation
+        task.Wait();
+    }
